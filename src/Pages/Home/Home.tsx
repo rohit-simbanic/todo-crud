@@ -5,10 +5,12 @@ import { Label, Pivot, PivotItem, Stack } from "@fluentui/react";
 import { PivotKeysEnum } from "../../Types/Types";
 import TaskList from "../TaskList/TaskList";
 import { initializeIcons } from "@fluentui/font-icons-mdl2";
+import TaskForm from "../../Components/TaskForm/TaskForm";
 initializeIcons();
 
 const Home = () => {
   const [selectedKey, setSelectedKey] = useState<string>(PivotKeysEnum.Tasks);
+
   return (
     <div className={HomeStyle.todoContainer}>
       <header className={HomeStyle.headerCss}>
@@ -34,6 +36,7 @@ const Home = () => {
             itemKey={PivotKeysEnum.TaskForm}
           >
             <Label>Pivot #2</Label>
+            <TaskForm />
           </PivotItem>
           <PivotItem
             headerText={data.pivots.completedTaskTab}
