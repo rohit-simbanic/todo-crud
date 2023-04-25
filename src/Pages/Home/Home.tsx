@@ -4,6 +4,8 @@ import data from "../../data/String.json";
 import { Label, Pivot, PivotItem, Stack } from "@fluentui/react";
 import { PivotKeysEnum } from "../../Types/Types";
 import TaskList from "../TaskList/TaskList";
+import { initializeIcons } from "@fluentui/font-icons-mdl2";
+initializeIcons();
 
 const Home = () => {
   const [selectedKey, setSelectedKey] = useState<string>(PivotKeysEnum.Tasks);

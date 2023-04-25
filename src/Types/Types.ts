@@ -7,4 +7,5 @@ export enum PivotKeysEnum {
 export type ITask = {
   id: string;
   title: string;
+  isFav: boolean;
 };
