@@ -10,7 +10,12 @@ initializeIcons();
 
 const Home = () => {
   const [selectedKey, setSelectedKey] = useState<string>(PivotKeysEnum.Tasks);
-
+  const [editTaskId, setEditTaskId] = useState<string | null>(null);
+  console.log(editTaskId);
+  const editTask = (id: string) => {
+    setEditTaskId(id);
+    setSelectedKey(PivotKeysEnum.TaskForm);
+  };
   return (
     <div className={HomeStyle.todoContainer}>
       <header className={HomeStyle.headerCss}>
@@ -21,6 +26,9 @@ const Home = () => {
           selectedKey={String(selectedKey)}
           styles={{ root: HomeStyle.pivotRoot }}
           onLinkClick={(item?: PivotItem) => {
+            if (item?.props.itemKey !== PivotKeysEnum.TaskForm) {
+              setEditTaskId(null);
+            }
             setSelectedKey(item?.props.itemKey || PivotKeysEnum.Tasks);
           }}
         >
@@ -29,14 +37,14 @@ const Home = () => {
             itemKey={PivotKeysEnum.Tasks}
           >
             <Label>Pivot #1</Label>
-            <TaskList />
+            <TaskList editTask={editTask} />
           </PivotItem>
           <PivotItem
             headerText={data.pivots.taskFormTab}
             itemKey={PivotKeysEnum.TaskForm}
           >
             <Label>Pivot #2</Label>
-            <TaskForm />
+            <TaskForm editTaskId={editTaskId} />
           </PivotItem>
           <PivotItem
             headerText={data.pivots.completedTaskTab}

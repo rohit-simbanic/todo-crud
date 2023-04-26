@@ -1,17 +1,33 @@
 import React from "react";
 import { ActionTypeEnum, ITask } from "../../Types/Types";
 import TaskStyle from "./TaskList.style";
-import { Checkbox, Stack } from "@fluentui/react";
+import { Checkbox, Stack, mergeStyles } from "@fluentui/react";
 import { FontIcon } from "@fluentui/react/lib/Icon";
 import { useTaskCustomContext } from "../../Context/TodoContext";
+import TaskDescription from "./TaskDescription";
+type TaskIDProps = {
+  editTask: (id: string) => void;
+};
 
-const TaskList = () => {
+const TaskList = ({ editTask }: TaskIDProps) => {
   const { activeTasks, dispatch } = useTaskCustomContext();
+  // delete function
   const onTaskDelete = (id: string) => {
     if (window.confirm("Are you sure to delete")) {
       dispatch({ type: ActionTypeEnum.Delete, data: { id } });
     }
   };
+  //toggle info view function
+  const onTaskFav = (id: string) => {
+    dispatch({ type: ActionTypeEnum.ToggleFavorite, data: { id } });
+  };
+
+  // check box handler
+  const checkBoxClickHandler = (id: string) => {
+    console.log(id);
+    dispatch({ type: ActionTypeEnum.Completed, data: { id } });
+  };
+
   console.log(activeTasks);
   return (
     <div>
@@ -20,24 +36,27 @@ const TaskList = () => {
           return (
             <Stack key={item.id} className={TaskStyle.taskItem}>
               <Stack horizontal>
-                <Checkbox />
+                <Checkbox onChange={() => checkBoxClickHandler(item.id)} />
                 {item.title}
               </Stack>
               <Stack horizontal>
-                <FontIcon
-                  aria-label="Info"
-                  iconName="info"
-                  className={TaskStyle.iconClass}
-                />
+                <TaskDescription item={item} />
+
                 <FontIcon
                   aria-label="Favorite"
                   iconName={item.isFav ? "FavoriteStarFill" : "FavoriteStar"}
-                  className={TaskStyle.iconClass}
+                  className={
+                    item.isFav
+                      ? mergeStyles(TaskStyle.iconClass, { color: "blue" })
+                      : TaskStyle.iconClass
+                  }
+                  onClick={() => onTaskFav(item.id)}
                 />
                 <FontIcon
                   aria-label="Edit"
                   iconName="Edit"
                   className={TaskStyle.iconClass}
+                  onClick={() => editTask(item.id)}
                 />
                 <FontIcon
                   aria-label="Delete"

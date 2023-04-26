@@ -16,16 +16,21 @@ export interface ITask {
 
 export interface ITodoContext {
   activeTasks: ITask[];
+  completedTasks: ITask[];
   dispatch: Dispatch<any>;
 }
 
 export interface ITodoState {
   activeTasks: ITask[];
+  completedTasks: ITask[];
 }
 
 export enum ActionTypeEnum {
   Add = "add",
   Delete = "delete",
+  ToggleFavorite = "favorite",
+  Update = "update",
+  Completed = "complete",
 }
 
 export interface IAddAction {
@@ -37,4 +42,22 @@ export interface IDeleteAction {
   data: { id: string };
 }
 
-export type IReducerAction = IAddAction | IDeleteAction;
+export interface IToggleFavorite {
+  type: ActionTypeEnum.ToggleFavorite;
+  data: { id: string };
+}
+export interface IUpdateAction {
+  type: ActionTypeEnum.Update;
+  data: ITask;
+}
+export interface ICompletedAction {
+  type: ActionTypeEnum.Completed;
+  data: { id: string };
+}
+
+export type IReducerAction =
+  | IAddAction
+  | IDeleteAction
+  | IToggleFavorite
+  | IUpdateAction
+  | ICompletedAction;

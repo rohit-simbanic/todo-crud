@@ -1,7 +1,6 @@
 import { createContext, useContext, useReducer } from "react";
 import {
   ActionTypeEnum,
-  IAddAction,
   IReducerAction,
   ITask,
   ITodoContext,
@@ -11,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const TodoContext = createContext<ITodoContext>({
   activeTasks: [],
+  completedTasks: [],
   dispatch: () => {},
 });
 export type TaskProviderProps = {
@@ -20,6 +20,8 @@ export type TaskProviderProps = {
 const reducer = (state: ITodoState, action: IReducerAction) => {
   // console.log(state);
   console.log(action);
+  let activeTasks: ITask[];
+  let index;
   switch (action.type) {
     case ActionTypeEnum.Add:
       const { data } = action;
@@ -27,12 +29,44 @@ const reducer = (state: ITodoState, action: IReducerAction) => {
       return { ...state, activeTasks: [action.data, ...state.activeTasks] };
 
     case ActionTypeEnum.Delete:
-      const activeTasks = state.activeTasks;
+      activeTasks = state.activeTasks;
       // console.log(activeTasks);
       const filteredTask = activeTasks.filter(
         (item) => item.id !== action.data.id
       );
       return { ...state, activeTasks: filteredTask };
+    case ActionTypeEnum.ToggleFavorite:
+      activeTasks = state.activeTasks;
+      // console.log(activeTasks);
+      index = activeTasks.findIndex((x) => x.id === action.data.id);
+      // console.log(index);
+      if (index >= 0) {
+        activeTasks[index].isFav = !activeTasks[index].isFav;
+      }
+      return { activeTasks };
+    case ActionTypeEnum.Update:
+      activeTasks = state.activeTasks;
+      // console.log(activeTasks);
+      index = activeTasks.findIndex((x) => x.id === action.data.id);
+      console.log(index);
+      if (index >= 0) {
+        activeTasks[index] = action.data;
+      }
+      console.log(activeTasks);
+      return { activeTasks };
+    case ActionTypeEnum.Completed:
+      activeTasks = state.activeTasks;
+      // console.log(activeTasks);
+      const completedTask = activeTasks.find(
+        (task) => task.id === action.data.id
+      );
+      const remainingTask = activeTasks.filter(
+        (item) => item.id !== action.data.id
+      );
+      return {
+        activeTasks: remainingTask,
+        completedTasks: [completedTask, ...state.completedTasks],
+      };
   }
   return { ...state };
 };
@@ -60,11 +94,13 @@ const AppProvider = ({ children }: TaskProviderProps) => {
       isFav: false,
     },
   ];
-  const data = { activeTasks: tasks };
+  const data: ITodoState = { activeTasks: tasks, completedTasks: [] };
   const [state, dispatch] = useReducer(reducer, data);
   console.log(state);
   return (
-    <TodoContext.Provider value={{ activeTasks: state.activeTasks, dispatch }}>
+    <TodoContext.Provider
+      value={{ activeTasks: state.activeTasks, completedTasks: [], dispatch }}
+    >
       {children}
     </TodoContext.Provider>
   );

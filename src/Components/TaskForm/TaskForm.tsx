@@ -5,7 +5,10 @@ import { PrimaryButton } from "@fluentui/react/lib/Button";
 import useInput from "../../hooks/useInput";
 import { useTaskCustomContext } from "../../Context/TodoContext";
 import { ActionTypeEnum, ITask } from "../../Types/Types";
-const TaskForm = () => {
+type IdProps = {
+  editTaskId: string | null;
+};
+const TaskForm = ({ editTaskId }: IdProps) => {
   // show form success message
   const [showMsg, setShowMsg] = useState<{
     type: MessageBarType;
@@ -15,13 +18,23 @@ const TaskForm = () => {
   const title = useInput("");
   const description = useInput("");
 
-  const { dispatch } = useTaskCustomContext();
+  const { dispatch, activeTasks } = useTaskCustomContext();
 
   console.log(title);
   console.log(description);
+  // show title / description on form after triggering the udpate icon
+  useEffect(() => {
+    let getTask;
+    if (editTaskId) {
+      getTask = activeTasks.find((item) => item.id === editTaskId);
+      title.set(getTask?.title || "");
+      description.set(getTask?.description || "");
+    }
+    console.log(getTask);
+  }, [editTaskId]);
 
-  const onFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // add task action function
+  const addTaskAction = () => {
     const data: ITask = {
       id: "",
       title: title.value,
@@ -29,7 +42,36 @@ const TaskForm = () => {
       isFav: false,
     };
     dispatch({ type: ActionTypeEnum.Add, data });
-    setShowMsg({ type: MessageBarType.success, message: "task added" });
+    setShowMsg({ type: MessageBarType.success, message: "Task added" });
+    title.set("");
+    description.set("");
+  };
+  // update task function call
+
+  const updateTaskAction = () => {
+    const getTask = activeTasks.find((task) => task.id === editTaskId);
+    if (getTask) {
+      const data: ITask = {
+        id: editTaskId || "",
+        title: title.value,
+        description: description.value,
+        isFav: getTask?.isFav || false,
+      };
+      dispatch({ type: ActionTypeEnum.Update, data });
+      setShowMsg({ type: MessageBarType.success, message: "Task Updated" });
+      title.set("");
+      description.set("");
+    } else {
+      setShowMsg({
+        type: MessageBarType.error,
+        message: "Error while updating Task",
+      });
+    }
+  };
+
+  const onFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    editTaskId ? updateTaskAction() : addTaskAction();
   };
 
   // remove success notification after 1 second
@@ -63,7 +105,10 @@ const TaskForm = () => {
           )}
         </Stack>
         <Stack>
-          <PrimaryButton text="Add Task" type="submit" />
+          <PrimaryButton
+            text={editTaskId ? "Update Task" : "Add Task"}
+            type="submit"
+          />
         </Stack>
       </Stack>
     </form>

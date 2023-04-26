@@ -6,6 +6,7 @@ import {
 interface ITaskListStyle {
   taskItem: IStyle;
   iconClass: IStyle;
+  disabled: IStyle;
 }
 const TaskStyle: IProcessedStyleSet<ITaskListStyle> = mergeStyleSets({
   taskItem: {
@@ -30,6 +31,12 @@ const TaskStyle: IProcessedStyleSet<ITaskListStyle> = mergeStyleSets({
     margin: "0 3px",
     selectors: {
       "&:hover": { cursor: "pointer" },
+    },
+  },
+  disabled: {
+    color: "gray",
+    selectors: {
+      "&:hover": { cursor: "default" },
     },
   },
 });
